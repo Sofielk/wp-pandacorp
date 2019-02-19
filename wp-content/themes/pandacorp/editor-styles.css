@@ -1,0 +1,8 @@
+@charset "UTF-8";
+/*!
+PandaCorp Editor Styles
+*/
+
+body .wp-block[data-align="full"] {
+	width: 100%;
+}

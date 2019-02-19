@@ -1,0 +1,46 @@
+# Ignore config and environment files
+wp-config.php
+.env
+
+# We would normally not commit the .htaccess file but for the ease of use
+# in the interview assignment, we just implement it so the "test'ee" do
+# not have to worry about it since caching is not part of the test.
+#.htaccess
+
+# We only really use SQL files locally, so lets ignore those.
+*.sql
+
+# Logfiles are specific to the environment
+*.log
+wp-content/wflogs
+
+# We build the theme & plugin assets with gulp and npm modules should only ever be used for development purposes.
+wp-content/themes/*/node_modules/*
+
+wp-content/plugins/*/node_modules/*
+wp-content/plugins/*/.sass-cache/*
+wp-content/plugins/*/bower_components/*
+
+# Sourcemaps not needed in prod.
+wp-content/themes/*/assets/css/maps/*.map
+wp-content/themes/*/dist/styles/*.map
+wp-content/themes/*/dist/scripts/*.map
+wp-content/themes/*/node_modules
+
+# We do not want dev data to go intop prod.
+wp-content/uploads/
+wp-content/plugins/uploads-by-proxy/*
+wp-content/plugins/disable-emails/*
+
+# Backups do not belong in prod
+wp-content/backups/
+wp-content/backup-db/
+
+# Cache
+wp-content/advanced-cache.php
+wp-content/cache/
+wp-content/w3tc-config/
+
+# We do not wan't any generated sitemaps.
+sitemap.xml
+sitemap.xml.gz

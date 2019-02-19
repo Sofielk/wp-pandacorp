@@ -1,0 +1,57 @@
+version: "2"
+services:
+
+  mariadb:
+    networks:
+      - default
+    #volumes:
+      #- ./docker/mariadb:/docker-entrypoint-initdb.d # Place init .sql file(s) here.
+      #- /path/to/mariadb/data/on/host:/var/lib/mysql # I want to manage volumes manually.
+
+  php:
+    networks:
+      - default
+    environment:
+      ## Read instructions at https://wodby.com/stacks/wordpress/docs/local/xdebug/
+      PHP_XDEBUG: 1
+      PHP_XDEBUG_DEFAULT_ENABLE: 1
+      PHP_XDEBUG_REMOTE_CONNECT_BACK: 1
+      PHP_XDEBUG_PORT: 9001
+      PHP_XDEBUG_REMOTE_PORT: 9001
+
+  mailhog:
+    networks:
+      - default
+      - web
+    labels:
+      - 'traefik.docker.network=traefik_webgateway'
+
+  apache:
+    networks:
+      - default
+      - web
+    labels:
+      - 'traefik.docker.network=traefik_webgateway'
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: wordpress
+      PMA_PASSWORD: wordpress
+      PHP_UPLOAD_MAX_FILESIZE: 1G
+      PHP_MAX_INPUT_VARS: 1G
+    networks:
+      - default
+      - web
+    labels:
+      - 'traefik.port=80'
+      - 'traefik.docker.network=traefik_webgateway'
+      - 'traefik.frontend.rule=Host:pma.${PROJECT_BASE_URL}'
+
+networks:
+  default:
+    driver: bridge
+  web:
+    external:
+      name: traefik_webgateway

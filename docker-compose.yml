@@ -1,0 +1,49 @@
+version: "2"
+services:
+
+  mariadb:
+    image: wodby/mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+
+  php:
+    image: wodby/wordpress-php:7.1-dev
+    environment:
+      PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
+      DB_HOST: $DB_HOST
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+    volumes:
+      - .:/var/www/html
+
+  mailhog:
+    image: mailhog/mailhog
+    labels:
+      - 'traefik.port=8025'
+      - 'traefik.frontend.rule=Host:mailhog.${PROJECT_BASE_URL}'
+
+  apache:
+    image: wodby/php-apache
+    depends_on:
+      - php
+    environment:
+      APACHE_LOG_LEVEL: debug
+      APACHE_BACKEND_HOST: php
+    volumes:
+      - .:/var/www/html
+    labels:
+      - 'traefik.port=80'
+      - 'traefik.frontend.rule=Host:${PROJECT_BASE_URL}'
+
+#  traefik:
+#    image: traefik
+#    command: -c /dev/null --web --docker --logLevel=INFO
+#    ports:
+#      - '8000:80'
+#      - '8080:8080' # Dashboard
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
